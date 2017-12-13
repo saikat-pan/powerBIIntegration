@@ -1,0 +1,61 @@
+﻿@model PowerBIEmbedded_AppOwnsData.Models.EmbedConfig
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script src="~/scripts/powerbi.js"></script>
+<script>
+    function GetSelected() {
+        var message = "";
+        var checkBoxList = document.getElementById("<%=chkFruits.ClientID%>");
+        var checkBoxes = checkBoxList.getElementsByTagName("INPUT");
+        for (var i = 0; i < checkBoxes.length; i++) {
+            if (checkBoxes[i].checked) {
+                var value = checkBoxes[i].value;
+                var text = checkBoxes[i].parentNode.getElementsByTagName("LABEL")[0].innerHTML;
+                message += "Text: " + text + " Value: " + value;
+                message += "\n";
+            }
+        }
+
+        alert(message);
+        return false;
+    }
+</script>
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div id="errorWrapper">
+        <h2>
+            Error
+        </h2>
+        @Model.ErrorMessage
+    </div>
+
+    return;
+}
+
+<h2>Embed Report Home</h2>
+@*$(document).ready(function () {
+    $('.CCB').change(function (event) {
+        if ($(this).is(':checked'))
+        {
+            var theId = $(this).attr('id'); // The id of the checkbox
+            var theValue = $(this).val(); // The value field of the checkbox
+        }
+    });
+});*@
+<div>
+    <b>Select an employee to display Report:</b><br />
+    @foreach (var item in @Model.Employees)
+    {
+        @Html.CheckBoxFor(model => item.IsSelected, new { @class = "CCB" })@item.EmployeeName
+        <br />
+    }
+</div>
+<br />
+<div>
+    <button id="btnGet" onclick="GetSelected()">Get Report</button>
+</div>
+@Html.Partial("_EmbedReport1",Model)
+

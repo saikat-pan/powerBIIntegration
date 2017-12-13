@@ -1,0 +1,133 @@
+﻿@model PowerBIEmbedded_AppOwnsData.Models.EmbedConfig
+<script src="~/scripts/powerbi.js"></script>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<body>
+    @using (Html.BeginForm("Index", "Home", FormMethod.Post))
+    {
+        <h2>Power BI Report Integration</h2>
+
+        <div>
+            <b>Select an employee to display Report:</b><br />
+            @for (int i = 0; i < Model.Employees.Count; i++)
+                {
+                <div>
+                    @Html.HiddenFor(m => Model.Employees[i].EmployeeName)
+                    @Html.CheckBoxFor(m => Model.Employees[i].IsSelected, Model.Employees[i].Id)
+                    @Html.DisplayFor(m => Model.Employees[i].EmployeeName)
+                </div>
+                <br />
+            }
+            @*@for (int i = 0; i < Model.Employees.Count; i++)
+                {
+                    <div>
+                        @Html.RadioButton("Employee", Model.Employees[i].EmployeeName, Model.Employees[i].IsSelected, new { @id = Model.Employees[i].Id })
+                        @Html.Label(Model.Employees[i].EmployeeName, new { @for = Model.Employees[i].Id })
+                    </div>
+                }*@
+
+            <br />
+
+        </div>
+        <br />
+        <input id="submit" type="submit" value="Submit" />
+        <div id="reportContainer"></div>
+
+
+    }
+    @if (ViewBag.Message != null)
+    {
+        <script>
+            // Read embed application token from Model
+            var accessToken = "@Model.EmbedToken.Token";
+
+            // Read embed URL from Model
+            var embedUrl = "@Html.Raw(Model.EmbedUrl)";
+
+            // Read report Id from Model
+            var embedReportId = "@Model.Id";
+
+            // Get models. models contains enums that can be used.
+            var models = window['powerbi-client'].models;
+
+            // Embed configuration used to describe the what and how to embed.
+            // This object is used when calling powerbi.embed.
+            // This also includes settings and options such as filters.
+            // You can find more information at https://github.com/Microsoft/PowerBI-JavaScript/wiki/Embed-Configuration-Details.
+            //alert(embedUrl);
+            var employee = "@ViewBag.Employee"
+            window.onload = function () {
+                var myFilter = {
+                    $schema: "http://powerbi.com/product/schema#basic",
+                    target: {
+                        table: "Executives",
+                        column: "Executive"
+                    },
+                    operator: "eq",
+                    values: [employee]
+                }
+
+
+                var config = {
+                    type: 'report',
+                    tokenType: models.TokenType.Embed,
+                    accessToken: accessToken,
+                    embedUrl: embedUrl,
+                    id: embedReportId,
+                    permissions: models.Permissions.All,
+                    filters: [myFilter],
+                    settings: {
+                        filterPaneEnabled: true,
+                        navContentPaneEnabled: true
+                    }
+                };
+                // Get a reference to the embedded report HTML element
+                var reportContainer = $('#reportContainer')[0];
+
+                // Embed the report and display it within the div container.
+                var report = powerbi.embed(reportContainer, config);
+
+                //Add filter to the report
+                //report.on('loaded', event => {
+                //    report.getFilters()
+                //      .then(filters => {
+                //          filters.push(filter);
+                //          return report.setFilters(filters);
+                //      });
+                //});
+                // Get a reference to the embedded report HTML element
+                //var report = powerbi.embed(reportContainer, config);
+                //var reportContainer = $('#reportContainer')[0];
+
+                // Embed the report and display it within the div container.
+                //var report = powerbi.embed(reportContainer, config);
+                //report.on('loaded', event => {
+                //    report.getFilters()
+                //        .then(filters => {
+                //            filters.push(filter);
+                //            return report.setFilters(filters);
+                //        })});
+            }
+        </script>
+    }
+    <div id="buttonsWrapper">
+        @*@Html.Partial("_EmbedReport1",Model)*@
+        @*Select an entity to embed.<br/><br/>*@
+        @*<a id="btnEmbedReprot" href="~/Home/EmbedReportHome">Embed Report</a>*@
+        <br />
+
+        @*<a id="btnEmbedDashboard" href="~/Home/EmbedDashboard">Embed Dashboard</a>
+            <br />
+
+            <a id="btnEmbedTile" href="~/Home/EmbedTile">Embed Tile</a>
+            <br />*@
+        @*<div class="infoBox">
+                <b>Nuget packages which used in this solution</b><br/>
+                Microsoft.PowerBI.API Version 2.0.0<br />
+                Microsoft.PowerBI.JavaScript Version 2.3.1<br />
+            </div>*@
+    </div>
+
+</body>
